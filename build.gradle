@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id "me.champeau.centralpublishing" version "0.6.0"
 }
 
 group = 'io.github.nicolascunha'
@@ -35,6 +36,7 @@ subprojects {
                     name = "SJL - ${project.name}"
                     description = 'Simple Java Library modular components'
                     url = 'https://github.com/NicolasCunha/sjl'
+
                     licenses {
                         license {
                             name = 'The Apache License, Version 2.0'
@@ -45,6 +47,7 @@ subprojects {
                         developer {
                             id = 'nicolascunha'
                             name = 'Nicolas Filipe Cunha'
+                            email = 'nicolascunha17@gmail.com'
                         }
                     }
                     scm {
@@ -55,27 +58,26 @@ subprojects {
                 }
             }
         }
-        repositories {
-            maven {
-                name = "OSSRH"
-                url = "https://central.sonatype.com/api/v1/publisher/deployments/authenticate"
-                credentials {
-                    username = System.getenv("MAVEN_USERNAME")
-                    password = System.getenv("MAVEN_PASSWORD")
-                }
-            }
-        }
     }
 
     signing {
         def signingKey = System.getenv("GPG_SIGNING_KEY")
         def signingPassword = System.getenv("GPG_PASSPHRASE")
 
-        if (signingKey != null && signingPassword != null) {
+        if (signingKey != null) {
             useInMemoryPgpKeys(signingKey, signingPassword)
             sign publishing.publications.mavenJava
         }
     }
+}
+
+centralPublishing {
+    publishingAllPublications()
+
+    username = System.getenv("MAVEN_USERNAME")
+    password = System.getenv("MAVEN_PASSWORD")
+
+    deploymentName = "SJL Release ${version}"
 }
 
 test {
