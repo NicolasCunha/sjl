@@ -2,9 +2,8 @@ plugins {
     id 'java'
 }
 
-// O grupo do projeto raiz deve ser o seu namespace verificado
 group = 'io.github.nicolascunha'
-version = '1.0.0' // Evite SNAPSHOT para publicação inicial no Central
+version = '1.0.0'
 
 repositories {
     mavenCentral()
@@ -15,7 +14,6 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'signing'
 
-    // Garante que todos os módulos (core, strings, etc) herdem o grupo correto
     group = 'io.github.nicolascunha'
     version = '1.0.0'
 
@@ -29,7 +27,6 @@ subprojects {
             mavenJava(MavenPublication) {
                 from components.java
 
-                // IMPORTANTE: Deve ser exatamente o namespace verificado no Sonatype
                 groupId = 'io.github.nicolascunha'
                 artifactId = project.name
                 version = '1.0.0'
@@ -74,7 +71,6 @@ subprojects {
         def signingKey = System.getenv("GPG_SIGNING_KEY")
         def signingPassword = System.getenv("GPG_PASSPHRASE")
 
-        // Só tenta assinar se as chaves estiverem presentes (evita erro em build local)
         if (signingKey != null && signingPassword != null) {
             useInMemoryPgpKeys(signingKey, signingPassword)
             sign publishing.publications.mavenJava
@@ -82,7 +78,6 @@ subprojects {
     }
 }
 
-// Configuração de testes no nível raiz se necessário
 test {
     useJUnitPlatform()
 }
