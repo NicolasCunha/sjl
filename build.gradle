@@ -43,7 +43,7 @@ subprojects {
                     }
                     developers {
                         developer {
-                            id = 'nicolasfcunha'
+                            id = 'io.github.nicolascunha'
                             name = 'Nicolas Filipe Cunha'
                         }
                     }
