@@ -1,15 +1,21 @@
 name: Build and Publish
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versão para o release (ex: 1.2.3)'
+        required: true
+        type: string
 
 jobs:
   build-and-publish:
     name: Build, Test and Deploy
     runs-on: ubuntu-latest
-    
+
+    permissions:
+      contents: write
+
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -33,24 +39,27 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Semantic Release
-        id: semrel
-        uses: cycjimmy/semantic-release-action@v4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and Test with Gradle
-        run: ./gradlew clean build -P version=${{ steps.semrel.outputs.new_release_version }}
+        run: ./gradlew clean build -Pversion=${{ github.event.inputs.version }}
 
       - name: Publish to Sonatype
         if: success()
-        run: ./gradlew publishToMavenCentral -P version=${{ steps.semrel.outputs.new_release_version }}
+        run: ./gradlew publishToMavenCentral -Pversion=${{ github.event.inputs.version }}
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SIGNING_KEY }}
-          ORG_GRADLE_PROJECT_version: ${{ github.event.head_commit.message }}
+
+      - name: Create GitHub Release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup GPG
         if: always()
