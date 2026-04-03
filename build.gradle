@@ -33,7 +33,7 @@ subprojects {
             name = "SJL"
             description = "A simple Java library."
             inceptionYear = "2026"
-            url = "https://github.com/NicolasCunha/SJL/"
+            url = "https://github.com/NicolasCunha/sjl/"
             licenses {
                 license {
                     name = "The Apache License, Version 2.0"
