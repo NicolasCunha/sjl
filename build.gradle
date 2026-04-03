@@ -19,10 +19,10 @@ subprojects {
     apply plugin: 'java-library'
     apply plugin: 'signing'
 
-    def projVersion = System.getProperty("version", "1.0.0")
+    def projVersion = project.findProperty("version") ?: "1.0.0"
 
     group = 'io.github.nicolascunha'
-    version = System.getProperty("version", "1.0.0")
+    version = projVersion
 
     mavenPublishing {
         publishToMavenCentral(true)
