@@ -15,39 +15,36 @@ group = 'io.github.nicolascunha'
 version = '1.0.0'
 
 subprojects {
-    apply plugin: 'maven-publish'
     apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
     apply plugin: 'signing'
     apply plugin: 'com.vanniktech.maven.publish'
 
     def projVersion = project.findProperty("version") ?: "1.0.0"
-
     group = 'io.github.nicolascunha'
     version = projVersion
 
     mavenPublishing {
+        // Usamos o helper do plugin para configurar tudo (JAR, Javadoc e Sources)
+        // Isso evita o conflito com as tarefas 'withJavadocJar' do Gradle
         configure(new com.vanniktech.maven.publish.JavaLibrary(
                 new com.vanniktech.maven.publish.JavadocJar.Javadoc(),
-                true
+                true // Isso já inclui o Sources Jar automaticamente
         ))
+
         publishToMavenCentral(true)
-
         signAllPublications()
-
-        println("Publishing ${name} version ${projVersion} to Maven Central")
-
-        coordinates("io.github.nicolascunha", "${name}", projVersion)
+        coordinates("io.github.nicolascunha", project.name, projVersion)
 
         pom {
-            name = "SJL"
-            description = "A simple Java library."
+            name = "SJL - ${project.name}"
+            description = "A simple Java library module."
             inceptionYear = "2026"
             url = "https://github.com/NicolasCunha/sjl/"
             licenses {
                 license {
                     name = "The Apache License, Version 2.0"
                     url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                    distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
                 }
             }
             developers {
@@ -65,11 +62,13 @@ subprojects {
         }
     }
 
-    java {
-        //withJavadocJar()
-        withSourcesJar()
-    }
+    // IMPORTANTE: Remova COMPLETAMENTE o bloco java { ... } daqui
+    // O plugin do Vanniktech já vai cuidar de gerar o JAR com as classes,
+    // o JAR de fontes e o JAR de javadoc através do configure() acima.
 
+    test {
+        useJUnitPlatform()
+    }
 }
 
 test {
