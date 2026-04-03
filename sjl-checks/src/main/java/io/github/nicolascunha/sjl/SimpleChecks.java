@@ -1,4 +1,4 @@
-package com.sjl.checks;
+package io.github.nicolascunha.sjl;
 
 import java.util.Collection;
 

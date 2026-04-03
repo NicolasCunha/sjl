@@ -1,13 +1,12 @@
-package com.sjl.checks;
+package io.github.nicolascunha;
 
+import io.github.nicolascunha.sjl.SimpleChecks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for {@link SimpleChecks}.

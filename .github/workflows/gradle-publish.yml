@@ -33,19 +33,17 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # ETAPA DE BUILD: Compila e roda os testes de todos os subprojetos
       - name: Build and Test with Gradle
-        run: ./gradlew build
+        run: ./gradlew clean build
 
-      # ETAPA DE PUBLICAÇÃO: Só executa se o 'build' acima terminar com sucesso (exit code 0)
       - name: Publish to Sonatype
         if: success()
-        run: ./gradlew publish
+        run: ./gradlew publishToMavenCentral
         env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
-          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.GPG_SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SIGNING_KEY }}
 
       - name: Cleanup GPG
         if: always()
