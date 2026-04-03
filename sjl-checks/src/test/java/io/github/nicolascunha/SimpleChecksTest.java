@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,18 +14,32 @@ import java.util.List;
  */
 class SimpleChecksTest {
 
-    @DisplayName("Assert check() throws IllegalArgumentException when expression is true")
+    @DisplayName("Assert check() throws IllegalArgumentException when expression is false.")
     @Test
     void assertCheck() {
         final SimpleChecks checks = new SimpleChecks();
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            checks.check(1 > 0, "Expression is true!");
-            checks.check(1 < 0, "Expression is true!");
+            checks.check(1 < 0, "One is always greater than zero!");
+            checks.check(0 > 1, "Zero is always lower than one!");
         });
 
         Assertions.assertDoesNotThrow(() -> {
-            checks.check(1 < 0, "Expression is false!");
-            checks.check(0 > 1, "Expression is false!");
+            checks.check(0 < 1, "One is always greater than zero!");
+            checks.check(1 > 0, "Zero is always lower than one!");
+        });
+    }
+
+    @DisplayName("Assert check() with Boolean supplier throws IllegalArgumentException when expression is false.")
+    @Test
+    void assertCheckWithSupplier() {
+        final SimpleChecks checks = new SimpleChecks();
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            checks.check(() -> 1 < 0, "One is always greater than zero!");
+            checks.check(() -> 0 > 1, "Zero is always lower than one!");
+        });
+        Assertions.assertDoesNotThrow(() -> {
+            checks.check(() -> 0 < 1, "One is always greater than zero!");
+            checks.check(() -> 1 > 0, "Zero is always lower than one!");
         });
     }
 
@@ -56,68 +71,68 @@ class SimpleChecksTest {
         });
     }
 
-    @DisplayName("Assert isNull() throws IllegalArgumentException when object is null.")
+    @DisplayName("Assert isNull() throws IllegalArgumentException when object is not null.")
     @Test
     void assertIsNull() {
         final SimpleChecks checks = new SimpleChecks();
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            final String userName = null;
-            checks.isNull(userName, "User name cannot be null!");
+            final String errorMessage = "null";
+            checks.isNull(errorMessage, "Error message must be null!");
         });
 
         Assertions.assertDoesNotThrow(() -> {
-            final String userName = "";
-            checks.isNull(userName, "User name cannot be null!");
+            final String errorMessage = null;
+            checks.isNull(errorMessage, "Error message must be null!");
         });
     }
 
-    @DisplayName("Assert isNotNull() throws IllegalArgumentException when object is not null.")
+    @DisplayName("Assert isNotNull() throws IllegalArgumentException when object is null.")
     @Test
     void assertIsNotNull() {
         final SimpleChecks checks = new SimpleChecks();
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-           final String userName = "AnAlreadyExistingUsername";
-           checks.isNotNull(userName, "Username is already present!");
+           final String userName = null;
+           checks.isNotNull(userName, "Username cannot be null!");
         });
         Assertions.assertDoesNotThrow(() -> {
-            final String userName = null;
-            checks.isNotNull(userName, "Username is already present!");
+            final String userName = "A good username";
+            checks.isNotNull(userName, "Username cannot be null!");
         });
     }
 
-    @DisplayName("Assert isEmpty() throws IllegalArgumentException when String is empty.")
+    @DisplayName("Assert isEmpty() throws IllegalArgumentException when String is not empty.")
     @Test
     void assertIsEmpty() {
         final SimpleChecks checks = new SimpleChecks();
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            final String userName = null;
-            checks.isEmpty(userName, "Username is null or empty!");
+            final String errorMessage = null;
+            checks.isEmpty(errorMessage, "Error message is null or has value!");
         });
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            final String userName = "";
-            checks.isEmpty(userName, "Username is null or empty!");
+            final String errorMessage = "An error occurred!";
+            checks.isEmpty(errorMessage, "Error message is null or has value!");
         });
         Assertions.assertDoesNotThrow(() -> {
-            final String userName = "AGreatUsername";
-            checks.isEmpty(userName, "Username is empty!");
+            final String errorMessage = "";
+            checks.isEmpty(errorMessage, "Error message is null or has value!!");
         });
     }
 
-    @DisplayName("Assert isBlank() throws IllegalArgumentException when String is blank.")
+    @DisplayName("Assert isBlank() throws IllegalArgumentException when String is not blank.")
     @Test
     void assertIsBlank() {
         final SimpleChecks checks = new SimpleChecks();
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            final String nullUsername = null;
-            checks.isBlank(nullUsername, "Username is null or blank!");
-            final String emptyUsername = "";
-            checks.isBlank(emptyUsername, "Username is null or blank!");
-            final String blankUsername = "   ";
-            checks.isBlank(blankUsername, "Username is null or blank!");
+            final String nullErrorMessage = null;
+            checks.isBlank(nullErrorMessage, "Error message is null or has value!");
+            final String errorMessageWithContent =  "An error occurred!";
+            checks.isBlank(errorMessageWithContent, "Error message is null or has value!");
         });
         Assertions.assertDoesNotThrow(() -> {
-            final String userName = "AmazingUsername";
-            checks.isBlank(userName, "Username is null blank!");
+            final String emptyErrorMessage = "";
+            checks.isBlank(emptyErrorMessage, "Error message is null or has value!");
+            final String blankErrorMessage = "     ";
+            checks.isBlank(blankErrorMessage, "Error message is null or has value!");
         });
     }
 
@@ -153,20 +168,19 @@ class SimpleChecksTest {
         });
     }
 
-    @DisplayName("Assert isEmpty() throws IllegalArgumentException when collection is null or empty.")
+    @DisplayName("Assert isEmpty() throws IllegalArgumentException when collection is null or not empty.")
     @Test
     void assertCollectionIsEmpty() {
         final SimpleChecks checks = new SimpleChecks();
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             final List<String> nullList = null;
-            checks.isEmpty(nullList, "Collection cannot be null or empty!");
-            final List<String> emptyList = java.util.Collections.emptyList();
-            checks.isEmpty(emptyList, "Collection cannot be null or empty!");
-        });
-        Assertions.assertDoesNotThrow(() -> {
+            checks.isEmpty(nullList, "Collection must be empty!");
             final List<String> listWithValues = new LinkedList<>();
             listWithValues.add("A nice value.");
-            checks.isEmpty(listWithValues, "Collection cannot be null or empty!");
+            checks.isEmpty(listWithValues, "Collection must be empty!");
+        });
+        Assertions.assertDoesNotThrow(() -> {
+            checks.isEmpty(Collections.emptyList(), "Collection must be empty!");
         });
     }
 

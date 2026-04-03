@@ -25,11 +25,9 @@ subprojects {
     version = projVersion
 
     mavenPublishing {
-        // Usamos o helper do plugin para configurar tudo (JAR, Javadoc e Sources)
-        // Isso evita o conflito com as tarefas 'withJavadocJar' do Gradle
         configure(new com.vanniktech.maven.publish.JavaLibrary(
                 new com.vanniktech.maven.publish.JavadocJar.Javadoc(),
-                true // Isso já inclui o Sources Jar automaticamente
+                true
         ))
 
         publishToMavenCentral(true)
@@ -61,10 +59,6 @@ subprojects {
             }
         }
     }
-
-    // IMPORTANTE: Remova COMPLETAMENTE o bloco java { ... } daqui
-    // O plugin do Vanniktech já vai cuidar de gerar o JAR com as classes,
-    // o JAR de fontes e o JAR de javadoc através do configure() acima.
 
     test {
         useJUnitPlatform()

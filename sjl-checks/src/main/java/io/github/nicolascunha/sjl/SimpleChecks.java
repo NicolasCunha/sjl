@@ -1,26 +1,26 @@
 package io.github.nicolascunha.sjl;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 /**
- * SimpleChecks provides a collection of methods to perform basic checks on various data types, such as null checks,
- * range checks, and type checks. These methods can be used to validate input parameters, ensure data integrity,
- * and prevent common programming errors.
+ * SimpleChecks provides utility guard methods that validate values and throw
+ * {@link IllegalArgumentException} when a condition is not satisfied.
  *
- * <p>The class is designed to be easy to use and can be integrated into any Java project to
- * enhance code robustness and maintainability.</p>
+ * <p>Each method delegates to {@link #check(Boolean, String)}, so the exception is thrown
+ * only when the evaluated condition is {@code false}.</p>
  *
  * <p>Sample usages:</p>
  * {@snippet lang="java" :
  *     final SimpleChecks sc = new SimpleChecks();
  *     sc.isNotNull("Alice", "User name is required!");
- *     sc.isBlank("  ", "Display name cannot be blank!");
+ *     sc.isBlank("   ", "Display name must be blank or null!");
  * }
  *
  * {@snippet lang="java" :
- *     final int quantity = 3;
+ *     final int quantity = 0;
  *     final SimpleChecks sc = new SimpleChecks();
- *     sc.isPositive(quantity, "Quantity must be positive!");
+ *     sc.isPositive(quantity, "Quantity must be non-negative!");
  * }
  */
 public class SimpleChecks {
@@ -30,23 +30,42 @@ public class SimpleChecks {
     }
 
     /**
-     * Ensures that a given boolean expression. If the expression is valid, throws an instance of
+     * Ensures the truth of the given expression. Otherwise, throws an instance of
      * {@link IllegalArgumentException} with the given message.
      *
      * <p>Sample usage:</p>
      * {@snippet lang="java" :
-     *     final int userAge = 18;
+     *     final int userAge = 21;
      *     final SimpleChecks sc = new SimpleChecks();
      *     sc.check(userAge > 18, "User must be an adult!");
      * }
      *
      * @param expression {@link Boolean} expression to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code expression} is {@code false}.
      */
     public void check(final Boolean expression, final String message) {
-        if (expression) {
+        if (!expression) {
             throw new IllegalArgumentException(message);
         }
+    }
+
+    /**
+     * Ensures the truth of a given boolean supplier. Otherwise, throws an
+     * instance of {@link IllegalArgumentException} with the given message.
+     *
+     * <p>Sample usage:</p>
+     * {@snippet lang="java" :
+     *     final SimpleChecks sc = new SimpleChecks();
+     *     sc.check(() -> 2 + 2 == 4, "Math is broken!");
+     * }
+     *
+     * @param expression {@link Supplier} of {@link Boolean}.
+     * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code expression.get()} is {@code false}.
+     */
+    public void check(final Supplier<Boolean> expression, final String message) {
+        check(expression.get(), message);
     }
 
     /**
@@ -55,16 +74,17 @@ public class SimpleChecks {
      *
      * <p>Sample usage:</p>
      * {@snippet lang="java" :
-     *     final boolean accountLocked = false;
+     *     final boolean accountIsActive = true;
      *     final SimpleChecks sc = new SimpleChecks();
-     *     sc.isTrue(accountLocked, "Account is locked!");
+     *     sc.isTrue(accountIsActive, "Account must be active!");
      * }
      *
      * @param expression {@link Boolean} expression to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code expression} is {@code false}.
      */
     public void isTrue(final Boolean expression, final String message) {
-        check(!expression, message);
+        check(expression, message);
     }
 
     /**
@@ -73,20 +93,21 @@ public class SimpleChecks {
      *
      * <p>Sample usage:</p>
      * {@snippet lang="java" :
-     *     final boolean hasPermission = true;
+     *     final boolean hasPermission = false;
      *     final SimpleChecks sc = new SimpleChecks();
      *     sc.isFalse(hasPermission, "Permission must not be granted!");
      * }
      *
      * @param expression {@link Boolean} expression to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code expression} is {@code true}.
      */
     public void isFalse(final Boolean expression, final String message) {
-        check(expression, message);
+        check(!expression, message);
     }
 
     /**
-     * Ensures that a given object is null. If it is, throws an instance of {@link IllegalArgumentException}
+     * Ensures that a given object is {@code null}. If it is not {@code null}, throws an instance of {@link IllegalArgumentException}
      * with the given message.
      *
      * <p>Sample usage:</p>
@@ -97,31 +118,34 @@ public class SimpleChecks {
      * }
      * @param obj {@link Object} instance to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code obj} is not {@code null}.
      */
     public void isNull(final Object obj, final String message) {
         check(obj == null, message);
     }
 
     /**
-     * Ensures that a given object is not null. If it is not null, throws an instance of
+     * Ensures that a given object is not {@code null}. If it is {@code null}, throws an instance of
      * {@link IllegalArgumentException} with the given message.
      *
      * <p>Sample usage:</p>
      * {@snippet lang="java" :
      *     final String sessionToken = "abc123";
      *     final SimpleChecks sc = new SimpleChecks();
-     *     sc.isNotNull(sessionToken, "Session token must be null!");
+     *     sc.isNotNull(sessionToken, "Session token is required!");
      * }
      *
      * @param obj {@link Object} instance to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code obj} is {@code null}.
      */
     public void isNotNull(final Object obj, final String message) {
         check(obj != null, message);
     }
 
     /**
-     * Ensures that a given string is empty. If it is empty or null, throws an instance of
+     * Ensures that a given string is empty and not {@code null}. If it is {@code null} or not empty,
+     * throws an instance of
      * {@link IllegalArgumentException} with the given message.
      *
      * <p>Sample usage:</p>
@@ -133,31 +157,35 @@ public class SimpleChecks {
      *
      * @param str {@link String} instance to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code str} is {@code null} or not empty.
      */
     public void isEmpty(final String str, final String message) {
-        check(str == null || str.isEmpty(), message);
+        check(str != null && str.isEmpty(), message);
     }
 
     /**
-     * Ensures that a given collection is empty. If it is null or empty, throws an instance of
+     * Ensures that a given collection is not {@code null} and empty. If it contains at least one element,
+     * throws an instance of
      * {@link IllegalArgumentException} with the given message.
      *
      * <p>Sample usage:</p>
      * {@snippet lang="java" :
-     *     final Collection<String> roles = new LinkedList();
+     *     final Collection<String> roles = java.util.List.of();
      *     final SimpleChecks sc = new SimpleChecks();
-     *     sc.isEmpty(roles, "Roles cannot be empty!");
+     *     sc.isEmpty(roles, "Roles must be empty!");
      * }
      *
      * @param collection {@link Collection} to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code collection} is not {@code null} and not empty.
      */
     public void isEmpty(final Collection<?> collection, final String message) {
-        check(collection == null || collection.isEmpty(), message);
+        check(collection != null && collection.isEmpty(), message);
     }
 
     /**
-     * Ensures that a given string is blank. If it is blank or null, throws an instance of
+     * Ensures that a given string is blank or {@code null}. If it is non-blank,
+     * throws an instance of
      * {@link IllegalArgumentException} with the given message.
      *
      * <p>Sample usage:</p>
@@ -169,13 +197,14 @@ public class SimpleChecks {
      *
      * @param str {@link String} instance to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code str} is non-blank.
      */
     public void isBlank(final String str, final String message) {
         check(str == null || str.isBlank(), message);
     }
 
     /**
-     * Ensures that a given number is positive. If it is zero or negative, throws an instance of
+     * Ensures that a given number is non-negative. If it is negative, throws an instance of
      * {@link IllegalArgumentException} with the given message.
      *
      * <p>Sample usage:</p>
@@ -187,27 +216,29 @@ public class SimpleChecks {
      *
      * @param number {@code int} value to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code number} is negative.
      */
     public void isPositive(final int number, final String message) {
-        check(number <= 0, message);
+        check(number >= 0, message);
     }
 
     /**
-     * Ensures that a given number is negative. If it is zero or positive, throws an instance of
+     * Ensures that a given number is non-positive. If it is positive, throws an instance of
      * {@link IllegalArgumentException} with the given message.
      *
      * <p>Sample usage:</p>
      * {@snippet lang="java" :
-     *     final int debt = 5;
+     *     final int debt = -5;
      *     final SimpleChecks sc = new SimpleChecks();
-     *     sc.isNegative(debt, "Debt value must be negative!");
+     *     sc.isNegative(debt, "Debt value must be non-positive!");
      * }
      *
      * @param number {@code int} value to be checked.
      * @param message {@link String} exception message.
+     * @throws IllegalArgumentException if {@code number} is positive.
      */
     public void isNegative(final int number, final String message) {
-        check(number >= 0, message);
+        check(number <= 0, message);
     }
 
 }
