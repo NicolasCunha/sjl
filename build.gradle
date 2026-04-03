@@ -25,6 +25,10 @@ subprojects {
     version = projVersion
 
     mavenPublishing {
+        configure(new com.vanniktech.maven.publish.JavaLibrary(
+                new com.vanniktech.maven.publish.JavadocJar.Javadoc(),
+                true
+        ))
         publishToMavenCentral(true)
 
         signAllPublications()
