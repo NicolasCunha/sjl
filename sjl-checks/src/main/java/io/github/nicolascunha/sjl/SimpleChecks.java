@@ -25,6 +25,10 @@ import java.util.Collection;
  */
 public class SimpleChecks {
 
+    public SimpleChecks() {
+        // noop
+    }
+
     /**
      * Ensures that a given boolean expression. If the expression is valid, throws an instance of
      * {@link IllegalArgumentException} with the given message.

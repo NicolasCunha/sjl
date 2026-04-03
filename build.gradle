@@ -20,14 +20,14 @@ subprojects {
     apply plugin: 'signing'
 
     group = 'io.github.nicolascunha'
-    version = '1.0.0'
+    version = System.getProperty("version", "1.0.0")
 
     mavenPublishing {
         publishToMavenCentral(true)
 
         signAllPublications()
 
-        coordinates("io.github.nicolascunha", "${name}", "1.0.0")
+        coordinates("io.github.nicolascunha", "${name}", version)
 
         pom {
             name = "SJL"
