@@ -27,7 +27,7 @@ subprojects {
 
         signAllPublications()
 
-        coordinates("io.github.nicolascunha.sjl", "${name}", "1.0.0")
+        coordinates("io.github.nicolascunha", "${name}", "1.0.0")
 
         pom {
             name = "SJL"
