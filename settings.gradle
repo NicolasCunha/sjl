@@ -1,2 +1,3 @@
 rootProject.name = 'sjl'
 include 'sjl-checks'
+include 'sjl-result'

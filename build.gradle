@@ -21,6 +21,7 @@ subprojects {
     apply plugin: 'com.vanniktech.maven.publish'
 
     def projVersion = project.findProperty("version") ?: "1.0.0"
+    def projDescription = project.findProperty("projectDescription") ?: "A simple Java library module."
     group = 'io.github.nicolascunha'
     version = projVersion
 
@@ -35,8 +36,8 @@ subprojects {
         coordinates("io.github.nicolascunha", project.name, projVersion)
 
         pom {
-            name = "SJL - ${project.name}"
-            description = "A simple Java library module."
+            name = "sjl - ${project.name}"
+            description = projDescription
             inceptionYear = "2026"
             url = "https://github.com/NicolasCunha/sjl/"
             licenses {
